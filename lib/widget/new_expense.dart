@@ -1,9 +1,12 @@
 import 'package:expense_tracker/models/expense.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+final formatter = DateFormat.yMd();
 
 // ignore: must_be_immutable
 class NewExpense extends StatefulWidget {
-  NewExpense(this.addExpense,{super.key});
+  NewExpense(this.addExpense, {super.key});
   // final List<Expense> _registeredExpenses;
   Function addExpense;
   @override
@@ -17,24 +20,31 @@ class _NewExpenseState extends State<NewExpense> {
   // void _saveTitleinput(String inputValue){
   //   _enteredtitle=inputValue;
   // }
-  late DateTime _selectedDate=DateTime.now();
-  _presentDatePicker() {
+  DateTime? _selectedDate;
+  Category _selectedCategory = Category.food;
+  _presentDatePicker() async {
     DateTime now = DateTime.now();
     DateTime firstDate = DateTime(now.year - 1, 1, 1);
     // DateTime lastDate = DateTime(now.year + 1, 1, 1);
     DateTime lastDate = now;
-    showDatePicker(
-        context: context,
-        initialDate: now,
-        firstDate: firstDate,
-        lastDate: lastDate,).then((val){
-          if(val!=null){
-            setState(() {
-              _selectedDate=val;
-            });
-          }
-          // _newExpense?.date=DateTime(val!.year,val.month,val.day);
-        });
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: firstDate,
+      lastDate: lastDate,
+    )
+        // .then((val){
+        //   if(val!=null){
+        //     setState(() {
+        //       _selectedDate=val;
+        //     });
+        //   }
+        // _newExpense?.date=DateTime(val!.year,val.month,val.day);
+        // });
+        ;
+    setState(() {
+      _selectedDate = pickedDate;
+    });
   }
 
   final _titleController = TextEditingController();
@@ -49,7 +59,7 @@ class _NewExpenseState extends State<NewExpense> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16,48,16,16),
       child: Column(
         children: [
           TextField(
@@ -65,8 +75,10 @@ class _NewExpenseState extends State<NewExpense> {
             height: 10,
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
+              SizedBox(
+                width: 150,
                 child: TextField(
                   controller: _amountController,
                   maxLength: 10,
@@ -75,51 +87,115 @@ class _NewExpenseState extends State<NewExpense> {
                       label: Text("Amount"), prefixText: "\$ "),
                 ),
               ),
-              const SizedBox(
-                width: 16,
-              ),
+              // const SizedBox(
+              //   height: 16,
+              // ),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    const Text("Selected Date"),
+                    Text((_selectedDate == null)
+                        ? "Select Date"
+                        : formatter.format(_selectedDate!)),
                     IconButton(
                       onPressed: _presentDatePicker,
                       icon: const Icon(Icons.calendar_month_outlined),
-                    )
+                    ),
                   ],
                 ),
               )
             ],
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  // print(_enteredtitle);
-                  // print(
-                  //     "Title:${_titleController.text} Amount:${_amountController.text}");
-                  // _newExpense?.title=_titleController.text;
-                  // _newExpense?.amount=double.parse(_amountController.text);
-                  // widget._registeredExpenses.add();
-                  widget.addExpense(Expense(_titleController.text, double.parse(_amountController.text), _selectedDate, Category.food));
-                  Navigator.pop(context);
+              DropdownButton(
+                value: _selectedCategory,
+                items: Category.values.map((cat) {
+                  return DropdownMenuItem(
+                    value: cat,
+                    child: Text(cat.name.toUpperCase()),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  setState(() {
+                    if (val != null) {
+                      _selectedCategory = val;
+                    }
+                  });
                 },
-                label: const Text("ADD"),
-                icon: const Icon(Icons.add_box_rounded),
               ),
               const Spacer(),
-              ElevatedButton.icon(
+              TextButton.icon(
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 label: const Text("Cancel"),
                 icon: const Icon(Icons.cancel),
               ),
+              ElevatedButton.icon(
+                onPressed: _submitExpenseData,
+                //  () {
+                //   // print(_enteredtitle);
+                //   // print(
+                //   //     "Title:${_titleController.text} Amount:${_amountController.text}");
+                //   // _newExpense?.title=_titleController.text;
+                //   // _newExpense?.amount=double.parse(_amountController.text);
+                //   // widget._registeredExpenses.add();
+                //   widget.addExpense(Expense(
+                //       _titleController.text,
+                //       double.parse(_amountController.text),
+                //       _selectedDate!,
+                //       _selectedCategory));
+
+                //   Navigator.pop(context);
+                // },
+                label: const Text("Save Expense"),
+                icon: const Icon(Icons.add_box_rounded),
+              ),
+              
             ],
           )
         ],
       ),
     );
+  }
+
+  void _submitExpenseData() {
+    double? enteredAmount = double.tryParse(_amountController.text);
+    bool amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
+    if (_titleController.text.trim().isEmpty ||
+        amountIsInvalid ||
+        _selectedDate == null) {
+      showDialog(
+          context: context,
+          builder: (cntx) {
+            return AlertDialog(
+              // alignment:Alignment.topCenter ,
+              title: const Text("Invalid Data"),
+              content: const Text(
+                "Please enter valid data",
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("OK"),
+                  ),
+                ),
+              ],
+            );
+          });
+      return;
+    }
+    widget.addExpense(
+      Expense(_titleController.text, enteredAmount, _selectedDate!,
+          _selectedCategory),
+    );
+    Navigator.pop(context);
   }
 }
