@@ -30,6 +30,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+"C:\UserInstalledProgram\AppDev\Projects\expense_tracker\build"
 
 # Symbolication related
 app.*.symbols
