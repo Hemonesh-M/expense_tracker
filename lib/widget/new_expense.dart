@@ -58,106 +58,163 @@ class _NewExpenseState extends State<NewExpense> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16,48,16,16),
-      child: Column(
-        children: [
-          TextField(
-            // onChanged: _saveTitleinput,
-            controller: _titleController,
-            maxLength: 50,
-            keyboardType: TextInputType.text,
-            decoration: const InputDecoration(
-              label: Text("Tittle"),
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                width: 150,
-                child: TextField(
-                  controller: _amountController,
-                  maxLength: 10,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                      label: Text("Amount"), prefixText: "\$ "),
-                ),
-              ),
-              // const SizedBox(
-              //   height: 16,
-              // ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text((_selectedDate == null)
-                        ? "Select Date"
-                        : formatter.format(_selectedDate!)),
-                    IconButton(
-                      onPressed: _presentDatePicker,
-                      icon: const Icon(Icons.calendar_month_outlined),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              DropdownButton(
-                value: _selectedCategory,
-                items: Category.values.map((cat) {
-                  return DropdownMenuItem(
-                    value: cat,
-                    child: Text(cat.name.toUpperCase()),
-                  );
-                }).toList(),
-                onChanged: (val) {
-                  setState(() {
-                    if (val != null) {
-                      _selectedCategory = val;
-                    }
-                  });
-                },
-              ),
-              const Spacer(),
-              TextButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                label: const Text("Cancel"),
-                icon: const Icon(Icons.cancel),
-              ),
-              ElevatedButton.icon(
-                onPressed: _submitExpenseData,
-                //  () {
-                //   // print(_enteredtitle);
-                //   // print(
-                //   //     "Title:${_titleController.text} Amount:${_amountController.text}");
-                //   // _newExpense?.title=_titleController.text;
-                //   // _newExpense?.amount=double.parse(_amountController.text);
-                //   // widget._registeredExpenses.add();
-                //   widget.addExpense(Expense(
-                //       _titleController.text,
-                //       double.parse(_amountController.text),
-                //       _selectedDate!,
-                //       _selectedCategory));
+    final keyboardSize = MediaQuery.of(context).viewInsets.bottom;
+    return LayoutBuilder(builder: (cxt, constraints) {
+      final w = constraints.maxWidth;
+      final h = constraints.maxHeight;
+      return newMethod(keyboardSize, context, w, h);
+    });
+  }
 
-                //   Navigator.pop(context);
-                // },
-                label: const Text("Save Expense"),
-                icon: const Icon(Icons.add_box_rounded),
+  SingleChildScrollView newMethod(
+      double keyboardSize, BuildContext context, double w, double h) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + keyboardSize),
+        child: Column(
+          children: [
+            if (w >= 600)
+              Row(
+                children: [
+                  Flexible(
+                      fit: FlexFit.tight,
+                      child: title(titleController: _titleController)),
+                  const SizedBox(
+                    width: 100,
+                  ),
+                  Expanded(child: amount(amountController: _amountController)),
+                ],
+              )
+            else
+              Row(
+                children: [
+                  Expanded(child: title(titleController: _titleController)),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                ],
               ),
-              
-            ],
-          )
-        ],
+            const SizedBox(
+              height: 25,
+            ),
+            if (w >= 600)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  dateSelecter(),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  cat(),
+                  Row(
+                    children: [
+                      cancelButton(context),
+                      submitButton(),
+                    ],
+                  ),
+                ],
+              )
+            else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  amount(amountController: _amountController),
+                  Expanded(
+                    child: dateSelecter(),
+                  )
+                ],
+              ),
+            if (w < 600)
+              Column(
+                children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  categoryPlusButtons(context)
+                ],
+              )
+          ],
+        ),
       ),
+    );
+  }
+
+  Row categoryPlusButtons(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        cat(),
+        const Spacer(),
+        cancelButton(context),
+        submitButton(),
+      ],
+    );
+  }
+
+  ElevatedButton submitButton() {
+    return ElevatedButton.icon(
+      onPressed: _submitExpenseData,
+      //  () {
+      //   // print(_enteredtitle);
+      //   // print(
+      //   //     "Title:${_titleController.text} Amount:${_amountController.text}");
+      //   // _newExpense?.title=_titleController.text;
+      //   // _newExpense?.amount=double.parse(_amountController.text);
+      //   // widget._registeredExpenses.add();
+      //   widget.addExpense(Expense(
+      //       _titleController.text,
+      //       double.parse(_amountController.text),
+      //       _selectedDate!,
+      //       _selectedCategory));
+
+      //   Navigator.pop(context);
+      // },
+      label: const Text("Save Expense"),
+      icon: const Icon(Icons.add_box_rounded),
+    );
+  }
+
+  TextButton cancelButton(BuildContext context) {
+    return TextButton.icon(
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      label: const Text("Cancel"),
+      icon: const Icon(Icons.cancel),
+    );
+  }
+
+  DropdownButton<Category> cat() {
+    return DropdownButton(
+      value: _selectedCategory,
+      items: Category.values.map((cat) {
+        return DropdownMenuItem(
+          value: cat,
+          child: Text(cat.name.toUpperCase()),
+        );
+      }).toList(),
+      onChanged: (val) {
+        setState(() {
+          if (val != null) {
+            _selectedCategory = val;
+          }
+        });
+      },
+    );
+  }
+
+  Row dateSelecter() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Text((_selectedDate == null)
+            ? "Select Date"
+            : formatter.format(_selectedDate!)),
+        IconButton(
+          onPressed: _presentDatePicker,
+          icon: const Icon(Icons.calendar_month_outlined),
+        ),
+      ],
     );
   }
 
@@ -197,5 +254,49 @@ class _NewExpenseState extends State<NewExpense> {
           _selectedCategory),
     );
     Navigator.pop(context);
+  }
+}
+
+class amount extends StatelessWidget {
+  const amount({
+    super.key,
+    required TextEditingController amountController,
+  }) : _amountController = amountController;
+
+  final TextEditingController _amountController;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 150,
+      child: TextField(
+        controller: _amountController,
+        maxLength: 10,
+        keyboardType: TextInputType.number,
+        decoration:
+            const InputDecoration(label: Text("Amount"), prefixText: "\$ "),
+      ),
+    );
+  }
+}
+
+class title extends StatelessWidget {
+  const title({
+    super.key,
+    required TextEditingController titleController,
+  }) : _titleController = titleController;
+
+  final TextEditingController _titleController;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _titleController,
+      maxLength: 50,
+      keyboardType: TextInputType.text,
+      decoration: const InputDecoration(
+        label: Text("Tittle"),
+      ),
+    );
   }
 }

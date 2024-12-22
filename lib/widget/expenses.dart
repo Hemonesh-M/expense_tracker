@@ -20,11 +20,12 @@ class _ExpensesState extends State<Expenses> {
     Expense('Black Myth Wukong', 999, DateTime.now(), Category.leisure),
     Expense('Flight', 4000, DateTime.now(), Category.travel),
   ];
-  void _openAddExpenseOverlay() {
+  void _openAddExpenseOverlay(double h,double w) {
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
-        // scrollControlDisabledMaxHeightRatio: 14,
+        useSafeArea: true,
+        constraints: BoxConstraints.expand(height:h>w? (3 * h) / 4:h),
         builder: (ctx) {
           return NewExpense(_addExpense);
         });
@@ -47,7 +48,6 @@ class _ExpensesState extends State<Expenses> {
         content: Text("Expense ${exp.title} Deleted"),
         duration: const Duration(seconds: 18),
         action: SnackBarAction(
-          
           label: "Undo",
           onPressed: () {
             setState(() {
@@ -61,32 +61,42 @@ class _ExpensesState extends State<Expenses> {
 
   @override
   Widget build(BuildContext context) {
-    double h=MediaQuery.of(context).size.height;
-    double w=MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
+    double w = MediaQuery.of(context).size.width;
     Widget mainContent = const Center(child: Text("No expenses added yet!"));
     if (_registeredExpenses.isNotEmpty) {
       mainContent = ExpenseList(_registeredExpenses, _removeExpense);
     }
     var port = Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // const SizedBox(height: 20,),
-          Expanded(child: Chart(_registeredExpenses)),
-          const Text("GRAPHS",style: TextStyle(fontSize: 20,),),
-          Expanded(child: mainContent),
-        ],
-      );
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // const SizedBox(height: 20,),
+        Expanded(child: Chart(_registeredExpenses)),
+        const Text(
+          "GRAPHS",
+          style: TextStyle(
+            fontSize: 20,
+          ),
+        ),
+        Expanded(child: mainContent),
+      ],
+    );
     var land = Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // const SizedBox(height: 20,),
-          Expanded(child: Chart(_registeredExpenses)),
-          const Text("GRAPHS",style: TextStyle(fontSize: 20,),),
-          Expanded(child: mainContent),
-        ],
-      );
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // const SizedBox(height: 20,),
+        Expanded(child: Chart(_registeredExpenses)),
+        const Text(
+          "GRAPHS",
+          style: TextStyle(
+            fontSize: 20,
+          ),
+        ),
+        Expanded(child: mainContent),
+      ],
+    );
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -96,7 +106,9 @@ class _ExpensesState extends State<Expenses> {
         backgroundColor: const Color.fromARGB(255, 42, 19, 78),
         actions: [
           IconButton(
-            onPressed: _openAddExpenseOverlay,
+            onPressed: () {
+              _openAddExpenseOverlay(h,w);
+            },
             icon: const Icon(
               Icons.add_box_outlined,
               color: Colors.white,
@@ -104,7 +116,7 @@ class _ExpensesState extends State<Expenses> {
           )
         ],
       ),
-      body: h>w?port:land,
+      body: w > h || w > 600 ? land : port,
     );
   }
 }
