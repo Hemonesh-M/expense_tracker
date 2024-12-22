@@ -14,18 +14,21 @@ class ChartBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         // crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            '\$${bucket.totalExpense.toStringAsFixed(0)}',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
           Flexible(
             child: FractionallySizedBox(
               widthFactor: 0.9,
               heightFactor: fill,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(25)),
-                  // color: isDarkMode?Theme.of(context).colorScheme.onSurface :Theme.of(context).colorScheme.onSurface,
-                  color: Theme.of(context).colorScheme.onSurface
-                ),
+                    shape: BoxShape.rectangle,
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(25)),
+                    // color: isDarkMode?Theme.of(context).colorScheme.onSurface :Theme.of(context).colorScheme.onSurface,
+                    color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
           ),
@@ -33,8 +36,7 @@ class ChartBar extends StatelessWidget {
             height: 5,
           ),
           Icon(categoryIcons[bucket.category],
-              size: 40,
-              color: Theme.of(context).colorScheme.onSurface),
+              size: 40, color: Theme.of(context).colorScheme.onSurface),
           const SizedBox(
             height: 5,
           ),
