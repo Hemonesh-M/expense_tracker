@@ -61,10 +61,32 @@ class _ExpensesState extends State<Expenses> {
 
   @override
   Widget build(BuildContext context) {
+    double h=MediaQuery.of(context).size.height;
+    double w=MediaQuery.of(context).size.width;
     Widget mainContent = const Center(child: Text("No expenses added yet!"));
     if (_registeredExpenses.isNotEmpty) {
       mainContent = ExpenseList(_registeredExpenses, _removeExpense);
     }
+    var port = Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // const SizedBox(height: 20,),
+          Expanded(child: Chart(_registeredExpenses)),
+          const Text("GRAPHS",style: TextStyle(fontSize: 20,),),
+          Expanded(child: mainContent),
+        ],
+      );
+    var land = Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // const SizedBox(height: 20,),
+          Expanded(child: Chart(_registeredExpenses)),
+          const Text("GRAPHS",style: TextStyle(fontSize: 20,),),
+          Expanded(child: mainContent),
+        ],
+      );
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -82,16 +104,7 @@ class _ExpensesState extends State<Expenses> {
           )
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // const SizedBox(height: 20,),
-          Expanded(child: Chart(_registeredExpenses)),
-          const Text("GRAPHS",style: TextStyle(fontSize: 20,),),
-          Expanded(child: mainContent),
-        ],
-      ),
+      body: h>w?port:land,
     );
   }
 }
