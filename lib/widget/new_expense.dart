@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:expense_tracker/models/expense.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -59,11 +62,13 @@ class _NewExpenseState extends State<NewExpense> {
   @override
   Widget build(BuildContext context) {
     final keyboardSize = MediaQuery.of(context).viewInsets.bottom;
-    return LayoutBuilder(builder: (cxt, constraints) {
-      final w = constraints.maxWidth;
-      final h = constraints.maxHeight;
-      return newMethod(keyboardSize, context, w, h);
-    });
+    return LayoutBuilder(
+      builder: (cxt, constraints) {
+        final w = constraints.maxWidth;
+        final h = constraints.maxHeight;
+        return newMethod(keyboardSize, context, w, h);
+      },
+    );
   }
 
   SingleChildScrollView newMethod(
@@ -88,7 +93,9 @@ class _NewExpenseState extends State<NewExpense> {
             else
               Row(
                 children: [
-                  Expanded(child: title(titleController: _titleController)),
+                  Expanded(
+                    child: title(titleController: _titleController),
+                  ),
                   const SizedBox(
                     height: 10,
                   ),
@@ -224,29 +231,9 @@ class _NewExpenseState extends State<NewExpense> {
     if (_titleController.text.trim().isEmpty ||
         amountIsInvalid ||
         _selectedDate == null) {
-      showDialog(
-          context: context,
-          builder: (cntx) {
-            return AlertDialog(
-              // alignment:Alignment.topCenter ,
-              title: const Text("Invalid Data"),
-              content: const Text(
-                "Please enter valid data",
-                textAlign: TextAlign.center,
-              ),
-              actions: [
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("OK"),
-                  ),
-                ),
-              ],
-            );
-          });
+      // Platform.isIOS? iosDialog():
+      // androidDialog();
+      _showDialog();
       return;
     }
     widget.addExpense(
@@ -254,6 +241,65 @@ class _NewExpenseState extends State<NewExpense> {
           _selectedCategory),
     );
     Navigator.pop(context);
+  }
+  void _showDialog(){
+    // if(Platform.isIOS){
+      iosDialog();
+    // }else{
+    //   androidDialog();
+    // }
+  }
+  Future<dynamic> androidDialog() {
+    return showDialog(
+        context: context,
+        builder: (cntx) {
+          return AlertDialog(
+            // alignment:Alignment.topCenter ,
+            title: const Text("Invalid Data"),
+            content: const Text(
+              "Please enter valid data",
+              textAlign: TextAlign.center,
+            ),
+            actions: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("OK"),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+  }
+  Future<dynamic> iosDialog() {
+    return showCupertinoDialog(
+        context: context,
+        builder: (cntx) {
+          return CupertinoAlertDialog(
+            // alignment:Alignment.topCenter ,
+            title: const Text("Invalid Data"),
+            content: const Text(
+              "Please enter valid data",
+              textAlign: TextAlign.center,
+            ),
+            actions: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("OK"),
+                ),
+              ),
+            ],
+          );
+        },
+      );
   }
 }
 
