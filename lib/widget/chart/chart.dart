@@ -7,7 +7,7 @@ class Chart extends StatelessWidget {
   final List<Expense> expenses;
   @override
   Widget build(BuildContext context) {
-  final isDarkMode=MediaQuery.of(context).platformBrightness==Brightness.dark;
+  // final isDarkMode=MediaQuery.of(context).platformBrightness==Brightness.dark;
     List<ExpenseBucket> expBuckets = [
       ExpenseBucket.forCategory(expenses, Category.food),
       ExpenseBucket.forCategory(expenses, Category.leisure),

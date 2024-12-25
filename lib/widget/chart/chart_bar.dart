@@ -7,8 +7,8 @@ class ChartBar extends StatelessWidget {
   final ExpenseBucket bucket;
   @override
   Widget build(BuildContext context) {
-    final isDarkMode =
-        MediaQuery.of(context).platformBrightness == Brightness.dark;
+    // final isDarkMode =
+    //     MediaQuery.of(context).platformBrightness == Brightness.dark;
     return Expanded(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,

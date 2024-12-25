@@ -83,18 +83,18 @@ class _NewExpenseState extends State<NewExpense> {
                 children: [
                   Flexible(
                       fit: FlexFit.tight,
-                      child: title(titleController: _titleController)),
+                      child: Title(titleController: _titleController)),
                   const SizedBox(
                     width: 100,
                   ),
-                  Expanded(child: amount(amountController: _amountController)),
+                  Expanded(child: Amount(amountController: _amountController)),
                 ],
               )
             else
               Row(
                 children: [
                   Expanded(
-                    child: title(titleController: _titleController),
+                    child: Title(titleController: _titleController),
                   ),
                   const SizedBox(
                     height: 10,
@@ -125,7 +125,7 @@ class _NewExpenseState extends State<NewExpense> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  amount(amountController: _amountController),
+                  Amount(amountController: _amountController),
                   Expanded(
                     child: dateSelecter(),
                   )
@@ -243,11 +243,11 @@ class _NewExpenseState extends State<NewExpense> {
     Navigator.pop(context);
   }
   void _showDialog(){
-    // if(Platform.isIOS){
+    if(Platform.isIOS){
       iosDialog();
-    // }else{
-    //   androidDialog();
-    // }
+    }else{
+      androidDialog();
+    }
   }
   Future<dynamic> androidDialog() {
     return showDialog(
@@ -303,8 +303,8 @@ class _NewExpenseState extends State<NewExpense> {
   }
 }
 
-class amount extends StatelessWidget {
-  const amount({
+class Amount extends StatelessWidget {
+  const Amount({
     super.key,
     required TextEditingController amountController,
   }) : _amountController = amountController;
@@ -326,8 +326,8 @@ class amount extends StatelessWidget {
   }
 }
 
-class title extends StatelessWidget {
-  const title({
+class Title extends StatelessWidget {
+  const Title({
     super.key,
     required TextEditingController titleController,
   }) : _titleController = titleController;
