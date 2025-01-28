@@ -19,7 +19,7 @@ class NewExpense extends StatefulWidget {
 }
 
 class _NewExpenseState extends State<NewExpense> {
-  // var _enteredtitle='';
+  // var _enteredtitle='';    
   // void _saveTitleinput(String inputValue){
   //   _enteredtitle=inputValue;
   // }
@@ -341,7 +341,7 @@ class Title extends StatelessWidget {
       maxLength: 50,
       keyboardType: TextInputType.text,
       decoration: const InputDecoration(
-        label: Text("Tittle"),
+        label: Text("Title"),
       ),
     );
   }
